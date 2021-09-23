@@ -1,7 +1,7 @@
 import {makeAutoObservable} from "mobx";
 
 
-type TodoType = {
+export type TodoType = {
     id: number | string;
     title: string;
     completed: boolean;
@@ -15,6 +15,7 @@ class Todo {
             completed: false,
         }
     ]
+    activeTodoId: number = 0
     constructor() {
         makeAutoObservable(this, {}, {deep: true});
     }
@@ -35,11 +36,13 @@ class Todo {
     changeTodoTitle(title: string, id: string | number) {
         this.todos = this.todos.map(t => t.id === id ? {...t, title} : t)
     }
+    getActiveTodoId(id: number) {
+        this.activeTodoId = id
+    }
     fetchTodo(){
         fetch('https://jsonplaceholder.typicode.com/todos')
             .then(response => response.json())
             .then(json => {
-                console.log(json)
                 this.todos = [...this.todos, ...json]
             })
     }

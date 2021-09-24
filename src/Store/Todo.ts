@@ -1,8 +1,10 @@
 import {makeAutoObservable} from "mobx";
-
+import {v1} from "uuid";
+import userStore from '../Store/Users'
 
 export type TodoType = {
-    id: number | string;
+    userId: number | undefined;
+    id: number;
     title: string;
     completed: boolean;
 }
@@ -10,6 +12,7 @@ export type TodoType = {
 class Todo {
     todos: TodoType[] = [
         {
+            userId: parseInt(v1().split('-').join(''), 16),
             id: 129019203,
             title: 'new',
             completed: false,
@@ -21,8 +24,8 @@ class Todo {
     }
     addTodo(title: string) {
         this.todos.push({
-            // id:  v1(),
-            id: Date.now(),
+            userId: userStore.activeUser?.id,
+            id: parseInt(v1().split('-').join(''), 16),
             title: title,
             completed: false
         })
@@ -40,7 +43,7 @@ class Todo {
         this.activeTodoId = id
     }
     fetchTodo(){
-        fetch('https://jsonplaceholder.typicode.com/todos')
+        fetch('https://jsonplaceholder.typicode.com/todos/')
             .then(response => response.json())
             .then(json => {
                 this.todos = [...this.todos, ...json]

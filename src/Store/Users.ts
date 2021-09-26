@@ -1,23 +1,32 @@
 import {makeAutoObservable} from "mobx";
+import {UserResponseType, usersAPI} from "../API/appAPI";
 
-type UserType = {
-    id: number;
-    name: string;
-}
+
 
 class User {
-    users: UserType[] = [];
-    activeUser: UserType  | null = null
+    users: UserResponseType[] = [];
+    userResponseStatus: string = '';
+    activeUser: UserResponseType | null = null
     constructor(){
         makeAutoObservable(this)
     }
-    setActiveUser(activeUser: UserType) {
+    setActiveUser(activeUser: UserResponseType) {
         this.activeUser = activeUser
     }
-    getUsers() {
-        fetch('https://jsonplaceholder.typicode.com/users')
-            .then(response => response.json())
-            .then(json => this.users = json)
+    async getUsers() {
+        try {
+            this.setStatus('Загрузка...')
+            this.users = await usersAPI.getUsers()
+        }
+        catch(e: any) {
+            throw e.response ?  new Error (`Статус ${e.response.status}`) : new Error ( e.message + ', more details in the console')
+        }
+        finally {
+            this.setStatus('')
+        }
+    }
+    setStatus(err: string) {
+        this.userResponseStatus = err
     }
 }
 export default new User()

@@ -1,16 +1,11 @@
 import {makeAutoObservable} from "mobx";
 import {v1} from "uuid";
 import userStore from '../Store/Users'
+import {TodoResponseType, todosAPI, UserResponseType} from "../API/appAPI";
 
-export type TodoType = {
-    userId: number | undefined;
-    id: number;
-    title: string;
-    completed: boolean;
-}
-
+export type TodoType = TodoResponseType;
 class Todo {
-    todos: TodoType[] = [
+    todos: TodoResponseType[] = [
         {
             userId: parseInt(v1().split('-').join(''), 16),
             id: 129019203,
@@ -18,36 +13,67 @@ class Todo {
             completed: false,
         }
     ]
-    activeTodoId: number = 0
+    activeTodoId: { id: number, title?: string } = {id: 0, title: ''}
     constructor() {
         makeAutoObservable(this, {}, {deep: true});
     }
-    addTodo(title: string) {
-        this.todos.push({
-            userId: userStore.activeUser?.id,
-            id: parseInt(v1().split('-').join(''), 16),
-            title: title,
-            completed: false
-        })
+    async fetchTodo() {
+        try {
+            this.todos = await todosAPI.getTodos()
+        }
+        catch(e: any) {
+            throw e.response ?  new Error (`Статус ${e.response.status}`) : new Error ( e.message + ', more details in the console')
+        }
+        finally {
+            console.log('Загрузка окончена')
+        }
     }
-    deleteTodo(id: string | number) {
-        this.todos = this.todos.filter(t => t.id !== id)
-    }
-    completeTodo(id: string | number) {
-        this.todos = this.todos.map(t => t.id === id ? {...t, completed: !t.completed} : t)
-    }
-    changeTodoTitle(title: string, id: string | number) {
-        this.todos = this.todos.map(t => t.id === id ? {...t, title} : t)
-    }
-    getActiveTodoId(id: number) {
-        this.activeTodoId = id
-    }
-    fetchTodo(){
-        fetch('https://jsonplaceholder.typicode.com/todos/')
-            .then(response => response.json())
-            .then(json => {
-                this.todos = [...this.todos, ...json]
+    async addTodo(title: string) {
+        try {
+            const newTask = await todosAPI.addTask(userStore.activeUser?.id ?? parseInt(v1().split('-').join(''), 16), title);
+            this.todos.push({
+                ...newTask,
+                completed: false
             })
+        }
+        catch (e: any){
+            throw e.response ?  new Error (`Статус ${e.response.status}`) : new Error ( e.message + ', more details in the console')
+        }
+        finally {
+
+        }
+    }
+    async deleteTodo(id: string | number) {
+        try{
+            await todosAPI.deleteTodos(id)
+            this.todos = this.todos.filter(t => t.id !== id)
+        }
+        catch(e: any){
+            throw e.response ?  new Error (`Статус ${e.response.status}`) : new Error ( e.message + ', more details in the console')
+        }
+        finally {
+
+        }
+    }
+    async completeTodo(id: string | number, completed: boolean) {
+        try {
+            await todosAPI.updateTodos(id, {
+                completed
+            })
+            this.todos = this.todos.map(t => t.id === id ? {...t, completed: !t.completed} : t)
+        }
+        catch(e: any) {
+            throw e.response ?  new Error (`Статус ${e.response.status}`) : new Error ( e.message + ', more details in the console')
+        }
+        finally {}
+    }
+    async changeTitleForTask(title: string)  {
+        await todosAPI.updateTodos(this.activeTodoId.id, {title})
+        this.todos = this.todos.map(t => t.id === this.activeTodoId.id ? {...t, title} : t)
+    }
+    setActiveTodoId(id: number, title?: string) {
+        this.activeTodoId.id = id
+        this.activeTodoId.title = title ?? ''
     }
 }
 

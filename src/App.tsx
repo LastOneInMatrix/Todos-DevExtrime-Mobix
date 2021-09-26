@@ -14,9 +14,7 @@ class App extends React.Component {
         return (
             <HashRouter>
                 <div className={style.main}>
-                    <div className={style.sidebar}>1</div>
-
-                    {/* eslint-disable-next-line react/jsx-no-undef */}
+                    <div className={style.sidebar}></div>
                     <div className={style.buttonsBlock}>
                         <Switch>
                             <Route exact path={'/'} render={() => <Users/>}/>

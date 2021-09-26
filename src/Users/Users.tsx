@@ -32,8 +32,10 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
 
     useEffect(() => {
         userStore.getUsers()
+            .catch(e => {
+                userStore.setStatus(e)
+            })
     }, [])
-    console.log(activeId)
     const userMemo = useMemo(() => {
         return userStore.users.map((u) => {
             return {id: u.id, name: u.name}
@@ -52,9 +54,16 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
         }, "info", 2000);
     }
     if (activeId !== '') {
-       return <Redirect to={`/todos/${activeId}`} />
+        return <Redirect to={`/todos/${activeId}`}/>
     }
-    console.log(userStore.activeUser)
+    if (userStore.userResponseStatus) {
+        notify({
+            message: userStore.userResponseStatus,
+            width: 200,
+            height: 50,
+            shading: true
+        })
+    }
     return <div>
         <b> Выберите юзера </b>
         <List

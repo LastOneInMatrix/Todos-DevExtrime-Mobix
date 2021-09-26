@@ -1,7 +1,7 @@
 import List, {ItemDragging} from 'devextreme-react/list';
 
 import Button from 'devextreme-react/button';
-import React, {useState} from 'react';
+import React, {createContext, useRef, useState} from 'react';
 import {toJS} from 'mobx';
 import todoStore, {TodoType} from "../Store/Todo";
 import {CheckBox} from 'devextreme-react/check-box';
@@ -10,61 +10,84 @@ import Toolbar, {Item} from 'devextreme-react/toolbar';
 import notify from "devextreme/ui/notify";
 import {useHistory} from "react-router";
 import userStore from "../Store/Users"
+import {observer} from "mobx-react-lite";
 
-type MyStateType = {};
+
+export const authContext = createContext({
+    authenticated: false,
+    setAuthenticated: (auth: boolean) => {}
+});
+
+
 export type ConnectedPropsType = any
 
-const ListItemTmpl: React.FC<ConnectedPropsType> = (props) => {
+const ListItemTmpl: React.FC<ConnectedPropsType> = observer((props) => {
     const style = {
         display: 'flex',
         justifyContent: 'space-between',
     }
     return (
         <div style={style}>
-            <CheckBox defaultValue={false} />
             <div>
-                {props.data.data.title}
-                <Button width={45} style={{margin: '10px'}} icon='rename' onClick={() => {
-                    props.togglePopup(props.data.data.id)
-                    todoStore.getActiveTodoId(props.data.data.id)
+                <CheckBox value={props.data.data.completed} onValueChange={() => {
+                    todoStore.setActiveTodoId(props.data.data.id)
+                    todoStore.completeTodo(todoStore.activeTodoId.id, !props.data.data.completed).catch(e => console.log(e))
                 }}/>
+                {props.data.data.title}
             </div>
 
             {/* eslint-disable-next-line react/jsx-no-undef */}
-
-            <Button
-                width={100}
-                icon="trash"
-                type="danger"
-                onClick={() => todoStore.deleteTodo(toJS(props.data.data.id))}
-            />
-
+            <div>
+                <Button width={45} style={{margin: '10px'}} icon='rename' onClick={() => {
+                    props.newRef.current = 'change'
+                    props.togglePopup(props.data.data.id)
+                    todoStore.setActiveTodoId(props.data.data.id, props.data.data.title)
+                }}/>
+                <Button
+                    width={45}
+                    icon="trash"
+                    type="danger"
+                    onClick={() => todoStore.deleteTodo(toJS(props.data.data.id))}
+                />
+            </div>
         </div>
     );
 
-}
+})
 
 type ListPropsType = { todos: TodoType[] };
 
 function renderLabel() {
-
     return <div className="toolbar-label"><b>Todo&apos;s for</b> {userStore.activeUser?.name}</div>;
 }
 export const TestListComponent = (props: ListPropsType) => {
+
     const history = useHistory()
     const backButtonOptions = {
         type: 'back',
-
         onClick: () => {
             history.push('/')
             todoStore.todos = [] //TODO узнать насчет прямого изменения без экшена
             notify('Здесь будет возврат на юзеров');
         }
     };
+
     const [isPopupVisible, setPopupVisibility] = useState(false);
 
-    const togglePopup = (id: number) => {
+    const togglePopup = () => {
         setPopupVisibility(!isPopupVisible);
+    };
+    const addButtonOptions = {
+        icon: 'plus',
+        onClick: () => {
+            setPopupVisibility(!isPopupVisible)
+            // todoStore.addTodo('s')
+            //     .then(e => notify('Таска добавилась', 'result', 1000))
+            //     .catch(e => {
+            //         debugger
+            //         notify(`Ошибка добавления ${e}`, 'error', 2000)
+            //     })
+        }
     };
 
     return (
@@ -72,17 +95,17 @@ export const TestListComponent = (props: ListPropsType) => {
             <Toolbar>
                 <Item location="before"
                       widget="dxButton"
-                      options={backButtonOptions} />
+                      options={backButtonOptions}/>
                 <Item location="before"
                       widget="dxButton"
-                      options={refreshButtonOptions} />
+                      options={refreshButtonOptions}/>
                 <Item location="after"
                       locateInMenu="auto"
                       widget="dxButton"
-                      options={addButtonOptions} />
+                      options={addButtonOptions}/>
                 <Item location="center"
                       locateInMenu="never"
-                      render={renderLabel} />
+                      render={renderLabel}/>
             </Toolbar>
             <List
                 height={'100vh'}
@@ -92,19 +115,20 @@ export const TestListComponent = (props: ListPropsType) => {
                 itemComponent={(data) => <ListItemTmpl data={data} togglePopup={togglePopup}/>}
                 dataSource={props.todos}
                 selectionMode="multiple"
-                pageLoadMode="nextButton">
+                pageLoadMode="nextButton"
+                scrollByContent={true}
+                showScrollbar="never"
+                style={{padding: '22px', margin: '10px'}}
+            >
                 <ItemDragging
                     allowReordering={true}
                 />
             </List>
-            <PopupForChanging isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
-
+                <PopupForChanging isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
         </React.Fragment>
     );
 
 }
-
-
 
 const refreshButtonOptions = {
     icon: 'refresh',
@@ -113,17 +137,5 @@ const refreshButtonOptions = {
     }
 };
 
-const addButtonOptions = {
-    icon: 'plus',
-    onClick: () => {
-        notify('Здесь будет всплывать модалка добавления!');
-    }
-};
 
-const saveButtonOptions = {
-    text:'Save',
-    onClick: () => {
-        notify('Save option has been clicked!');
-    }
-};
 

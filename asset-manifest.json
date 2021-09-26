@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/Todos-DevExtrime-Mobix/static/css/main.37b9c03e.chunk.css",
+    "main.js": "/Todos-DevExtrime-Mobix/static/js/main.d5d3e3a0.chunk.js",
+    "main.js.map": "/Todos-DevExtrime-Mobix/static/js/main.d5d3e3a0.chunk.js.map",
+    "runtime-main.js": "/Todos-DevExtrime-Mobix/static/js/runtime-main.f9611bab.js",
+    "runtime-main.js.map": "/Todos-DevExtrime-Mobix/static/js/runtime-main.f9611bab.js.map",
+    "static/css/2.38a8e215.chunk.css": "/Todos-DevExtrime-Mobix/static/css/2.38a8e215.chunk.css",
+    "static/js/2.da943941.chunk.js": "/Todos-DevExtrime-Mobix/static/js/2.da943941.chunk.js",
+    "static/js/2.da943941.chunk.js.map": "/Todos-DevExtrime-Mobix/static/js/2.da943941.chunk.js.map",
+    "static/js/3.8818f88b.chunk.js": "/Todos-DevExtrime-Mobix/static/js/3.8818f88b.chunk.js",
+    "static/js/3.8818f88b.chunk.js.map": "/Todos-DevExtrime-Mobix/static/js/3.8818f88b.chunk.js.map",
+    "index.html": "/Todos-DevExtrime-Mobix/index.html",
+    "static/css/2.38a8e215.chunk.css.map": "/Todos-DevExtrime-Mobix/static/css/2.38a8e215.chunk.css.map",
+    "static/css/main.37b9c03e.chunk.css.map": "/Todos-DevExtrime-Mobix/static/css/main.37b9c03e.chunk.css.map",
+    "static/js/2.da943941.chunk.js.LICENSE.txt": "/Todos-DevExtrime-Mobix/static/js/2.da943941.chunk.js.LICENSE.txt",
+    "static/media/dx.light.css": "/Todos-DevExtrime-Mobix/static/media/dxicons.d8b3a23c.ttf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f9611bab.js",
+    "static/css/2.38a8e215.chunk.css",
+    "static/js/2.da943941.chunk.js",
+    "static/css/main.37b9c03e.chunk.css",
+    "static/js/main.d5d3e3a0.chunk.js"
+  ]
+}

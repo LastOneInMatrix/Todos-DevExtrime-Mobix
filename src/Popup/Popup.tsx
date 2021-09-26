@@ -11,10 +11,10 @@ const RenderContent = observer((props: any) =>  {
     const [text, setText] = useState<string>(todoStore.activeTodoId.title ?? '');
     const sendData = (event: FormEvent<HTMLFormElement>) => {
         const type = props.actionType === 'Add' ? 'addTodo' : 'changeTitleForTask';
-
         todoStore
         [type](text)
             .catch(e=>console.log(e))
+        props.togglePopup();
         event.preventDefault();
     }
     const submitButtonOptions = {
@@ -24,7 +24,7 @@ const RenderContent = observer((props: any) =>  {
     return (
         <form action="your-action" onSubmit={sendData}>
             <Form>
-                <SimpleItem dataField="email">
+                <SimpleItem dataField="Title">
                     <TextBox
                         defaultValue={text}
                         onOptionChanged={e => {

@@ -1,8 +1,14 @@
-import { createContext } from "react";
+import React  from "react";
 
-const hideContext = createContext({
-    show: false,
-    setAuthenticated: (auth: boolean) => {}
-});
 
-export default hideContext;
+export const themes = {
+    hide: true,
+    toggleTheme: () => {},
+}
+
+
+
+
+export const hideContext = React.createContext(
+    themes.hide
+);

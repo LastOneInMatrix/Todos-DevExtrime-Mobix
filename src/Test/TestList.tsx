@@ -1,7 +1,6 @@
-import List, {ItemDragging} from 'devextreme-react/list';
-
 import Button from 'devextreme-react/button';
-import React, {createContext, useRef, useState} from 'react';
+import React, {useState} from 'react';
+import List, {ItemDragging} from 'devextreme-react/list';
 import {toJS} from 'mobx';
 import todoStore, {TodoType} from "../Store/Todo";
 import {CheckBox} from 'devextreme-react/check-box';
@@ -11,12 +10,6 @@ import notify from "devextreme/ui/notify";
 import {useHistory} from "react-router";
 import userStore from "../Store/Users"
 import {observer} from "mobx-react-lite";
-
-
-export const authContext = createContext({
-    authenticated: false,
-    setAuthenticated: (auth: boolean) => {}
-});
 
 
 export type ConnectedPropsType = any
@@ -39,7 +32,7 @@ const ListItemTmpl: React.FC<ConnectedPropsType> = observer((props) => {
             {/* eslint-disable-next-line react/jsx-no-undef */}
             <div>
                 <Button width={45} style={{margin: '10px'}} icon='rename' onClick={() => {
-                    props.newRef.current = 'change'
+                    todoStore.setActionType('Change')
                     props.togglePopup(props.data.data.id)
                     todoStore.setActiveTodoId(props.data.data.id, props.data.data.title)
                 }}/>
@@ -55,11 +48,12 @@ const ListItemTmpl: React.FC<ConnectedPropsType> = observer((props) => {
 
 })
 
-type ListPropsType = { todos: TodoType[] };
+type ListPropsType = { todos: TodoType[]};
 
 function renderLabel() {
     return <div className="toolbar-label"><b>Todo&apos;s for</b> {userStore.activeUser?.name}</div>;
 }
+
 export const TestListComponent = (props: ListPropsType) => {
 
     const history = useHistory()
@@ -80,6 +74,7 @@ export const TestListComponent = (props: ListPropsType) => {
     const addButtonOptions = {
         icon: 'plus',
         onClick: () => {
+            todoStore.setActionType('Add')
             setPopupVisibility(!isPopupVisible)
             // todoStore.addTodo('s')
             //     .then(e => notify('Таска добавилась', 'result', 1000))
@@ -92,6 +87,8 @@ export const TestListComponent = (props: ListPropsType) => {
 
     return (
         <React.Fragment>
+
+
             <Toolbar>
                 <Item location="before"
                       widget="dxButton"
@@ -112,7 +109,9 @@ export const TestListComponent = (props: ListPropsType) => {
                 searchMode={'contains'}
                 searchExpr={['title']}
                 searchEnabled={true}
-                itemComponent={(data) => <ListItemTmpl data={data} togglePopup={togglePopup}/>}
+                itemComponent={(data) => (
+                    <ListItemTmpl data={data} togglePopup={togglePopup}/>
+                )}
                 dataSource={props.todos}
                 selectionMode="multiple"
                 pageLoadMode="nextButton"
@@ -124,7 +123,7 @@ export const TestListComponent = (props: ListPropsType) => {
                     allowReordering={true}
                 />
             </List>
-                <PopupForChanging isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
+            <PopupForChanging actionType={todoStore.actionType} isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
         </React.Fragment>
     );
 

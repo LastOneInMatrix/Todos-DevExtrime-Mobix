@@ -1,7 +1,7 @@
 import {makeAutoObservable} from "mobx";
 import {v1} from "uuid";
 import userStore from '../Store/Users'
-import {TodoResponseType, todosAPI, UserResponseType} from "../API/appAPI";
+import {TodoResponseType, todosAPI} from "../API/appAPI";
 
 export type TodoType = TodoResponseType;
 class Todo {
@@ -14,6 +14,7 @@ class Todo {
         }
     ]
     activeTodoId: { id: number, title?: string } = {id: 0, title: ''}
+    actionType: string = ''
     constructor() {
         makeAutoObservable(this, {}, {deep: true});
     }
@@ -30,8 +31,9 @@ class Todo {
     }
     async addTodo(title: string) {
         try {
+           console.log(userStore.activeUser?.id)
             const newTask = await todosAPI.addTask(userStore.activeUser?.id ?? parseInt(v1().split('-').join(''), 16), title);
-            this.todos.push({
+            this.todos.unshift({
                 ...newTask,
                 completed: false
             })
@@ -74,6 +76,9 @@ class Todo {
     setActiveTodoId(id: number, title?: string) {
         this.activeTodoId.id = id
         this.activeTodoId.title = title ?? ''
+    }
+    setActionType(action: string) {
+        this.actionType =action
     }
 }
 

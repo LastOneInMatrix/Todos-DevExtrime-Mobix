@@ -1,10 +1,15 @@
-import React, {FormEvent, useState} from 'react';
+import React, {FormEvent, useEffect, useState} from 'react';
 import {Popup} from 'devextreme-react/popup';
 import {observer} from "mobx-react-lite";
 import todoStore from "../Store/Todo";
 import Button from "devextreme-react/button";
 import {TextBox} from "devextreme-react";
 import {ButtonItem, Form, SimpleItem,} from 'devextreme-react/form';
+// import DevExpress from "devextreme";
+// import NativeEventInfo = DevExpress.events.NativeEventInfo;
+// import dxTextBox from "devextreme/ui/text_box";
+// import {ValueChangedInfo} from "devextreme/ui/editor/editor";
+
 
 type PopupForChangingPropsType = {
     actionType: string;
@@ -16,7 +21,14 @@ type RenderContentPropsType = {
     togglePopup: () => void;
 }
 const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
-    const [text, setText] = useState<string>(todoStore.activeTodoId.title ?? '');
+    const [text, setText] = useState<string>('');
+    useEffect(() => {
+        setText(todoStore.activeTodoId.title ?? '');
+        return () => {
+            // setText('');
+        }
+    }, [todoStore.activeTodoId.title]);
+
     const sendData = (event: FormEvent<HTMLFormElement>) => {
         const type = props.actionType === 'Add' ? 'addTodo' : 'changeTitleForTask';
         todoStore
@@ -24,20 +36,28 @@ const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
             .catch(e=>console.log(e))
         props.togglePopup();
         event.preventDefault();
+        todoStore.activeTodoId.title = ''
     }
     const submitButtonOptions = {
         text: "Submit the Form",
         useSubmitBehavior: true
+    };
+
+    const valueChangedHandler = (e: any) => {
+        const newValue = e.value;
+        setText(newValue);
     };
     return (
         <form action="your-action" onSubmit={sendData}>
             <Form>
                 <SimpleItem dataField="Title">
                     <TextBox
-                        defaultValue={text}
-                        onOptionChanged={e => {
-                            setText(e.value)
-                        }}
+                        // defaultValue={text}
+                        // onOptionChanged={e => {
+                        //     setText(e.value)
+                        // }} //Todo разобраться с работой при изменении в TextBox и как правильно типизировать events
+                        value={text}
+                        onValueChanged={valueChangedHandler}
                         placeholder={'Please type title for task'}
                     />
                 </SimpleItem>
@@ -51,7 +71,6 @@ const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
                 <ButtonItem buttonOptions={submitButtonOptions} />
             </Form>
         </form>
-
     )
 });
 

@@ -5,6 +5,7 @@ import todoStore from "../Store/Todo";
 import Button from "devextreme-react/button";
 import {TextBox} from "devextreme-react";
 import {ButtonItem, Form, SimpleItem,} from 'devextreme-react/form';
+import st from './popup.module.css'
 // import DevExpress from "devextreme";
 // import NativeEventInfo = DevExpress.events.NativeEventInfo;
 // import dxTextBox from "devextreme/ui/text_box";
@@ -25,9 +26,9 @@ const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
     useEffect(() => {
         setText(todoStore.activeTodoId.title ?? '');
         return () => {
-            // setText('');
+            setText('');
         }
-    }, [todoStore.activeTodoId.title]);
+    }, [todoStore.activeTodoId.title]); //Todo уточнить насчет мутируемых депов
 
     const sendData = (event: FormEvent<HTMLFormElement>) => {
         const type = props.actionType === 'Add' ? 'addTodo' : 'changeTitleForTask';
@@ -48,7 +49,7 @@ const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
         setText(newValue);
     };
     return (
-        <form action="your-action" onSubmit={sendData}>
+        <form action="action" onSubmit={sendData}>
             <Form>
                 <SimpleItem dataField="Title">
                     <TextBox
@@ -76,14 +77,12 @@ const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
 
 export const PopupForChanging: React.FC<PopupForChangingPropsType> = observer((props) =>  {
     return (
-        <div className="App">
+        <div className={st.container}>
             <Popup
                 title={`${props.actionType} task`}
                 visible={props.isPopupVisible}
                 closeOnOutsideClick={true}
                 onHiding={props.togglePopup}
-                width={500}
-                height={250}
                 resizeEnabled={true}
                 contentRender={() => <RenderContent actionType={props.actionType} togglePopup={props.togglePopup}/>}
             />

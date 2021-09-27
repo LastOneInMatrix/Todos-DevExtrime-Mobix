@@ -11,7 +11,7 @@ import {useHistory} from "react-router";
 import userStore from "../Store/Users"
 import {observer} from "mobx-react-lite";
 import {TodoResponseType} from "../API/appAPI";
-
+import styles from './testList.module.css';
 
 type ListItemTmplPropsType = {
     data: {
@@ -22,22 +22,20 @@ type ListItemTmplPropsType = {
 };
 type ListPropsType = { todos: TodoType[]};
 
-const style = {
-    display: 'flex',
-    justifyContent: 'space-between',
-};
+
 
 const ListItemTmpl: React.FC<ListItemTmplPropsType> = observer((props) => {
     return (
-        <div style={style}>
-            <div>
+        <div className={styles.container}>
+            <div className={styles.taskText}>
                 <CheckBox value={props.data.data.completed} onValueChange={() => {
                     todoStore.setActiveTodoId(props.data.data.id);
                     todoStore
                         .completeTodo(todoStore.activeTodoId.id, !props.data.data.completed)
                         .catch(e => console.log(e));
                 }}/>
-                {props.data.data.title}
+                   <p>{props.data.data.title}</p>
+
             </div>
             <div>
                 <Button width={45} style={{margin: '10px'}} icon='rename' onClick={() => {

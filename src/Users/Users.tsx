@@ -6,11 +6,12 @@ import List, {MenuItem} from 'devextreme-react/list';
 import notify from 'devextreme/ui/notify';
 import {ItemClickEvent} from "devextreme/ui/list";
 import {Redirect} from "react-router";
-
+import styles from './users.module.css';
 type ListItemPropsType = {
     data: { id: number, name: string }
 }
 type UsersPropsType = {}
+
 const style = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -64,18 +65,20 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
         })
     }
 
-    return <div>
-        <b> Выберите юзера </b>
-        <List
-            height={'100vh'}
-            dataSource={userMemo}
-            itemComponent={ListItem}
-            onItemClick={selectItem}
-        >
-            <MenuItem
-                text="Show Details"
-                action={showItem}
-            />
-        </List>
+    return <div className={styles.main}>
+        <h3 className={styles.title}> Выберите юзера </h3>
+        <div className={styles.container}>
+            <List
+                // height={'90vh'}
+                dataSource={userMemo}
+                itemComponent={ListItem}
+                onItemClick={selectItem}
+            >
+                <MenuItem
+                    text="Show Details"
+                    action={showItem}
+                />
+            </List>
+        </div>
     </div>
 })

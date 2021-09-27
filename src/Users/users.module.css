@@ -1,0 +1,14 @@
+.main {
+    text-align: center;
+}
+.title {
+    padding-bottom: 10px;
+}
+.container {
+    margin: 0 auto;
+    border: 3px solid #2eb433;
+    border-radius: 10px;
+    box-shadow: 1px 5px 5px 1px #74d7b5;
+    padding: 10px;
+    max-width: 500px;
+}

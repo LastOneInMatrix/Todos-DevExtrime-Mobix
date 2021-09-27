@@ -11,24 +11,34 @@ type ListItemPropsType = {
     data: { id: number, name: string }
 }
 type UsersPropsType = {}
-
 const style = {
     display: 'flex',
     justifyContent: 'space-between',
 }
-const ListItem = (props: ListItemPropsType) => {
 
+const ListItem = (props: ListItemPropsType) => {
     return (
         <pre style={style}>
                     <b>{props.data.name}</b>
                     <b>Users id: {props.data.id}</b>
             </pre>
-
     );
 };
 
 export const Users: React.FC<UsersPropsType> = observer((props) => {
     const [activeId, setActiveId] = useState<string>('');
+    const selectItem = ({itemData, ...rest}: ItemClickEvent) => {
+        userStore.setActiveUser(itemData)
+        setActiveId(itemData.id)
+    };
+    const showItem = ({itemData}: any) => {
+        notify({
+            message: `Name: ${itemData.name} ID: ${itemData.id}`,
+            width: 250,
+            height: 250,
+            shading: true
+        }, "info", 2000);
+    };
 
     useEffect(() => {
         userStore.getUsers()
@@ -41,18 +51,7 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
             return {id: u.id, name: u.name}
         })
     }, [userStore.users])
-    const selectItem = ({itemData, ...rest}: ItemClickEvent) => {
-        userStore.setActiveUser(itemData)
-        setActiveId(itemData.id)
-    };
-    const showItem = ({itemData}: any) => {
-        notify({
-            message: `Name: ${itemData.name} ID: ${itemData.id}`,
-            width: 250,
-            height: 250,
-            shading: true
-        }, "info", 2000);
-    }
+
     if (activeId !== '') {
         return <Redirect to={`/todos/${activeId}`}/>
     }
@@ -64,6 +63,7 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
             shading: true
         })
     }
+
     return <div>
         <b> Выберите юзера </b>
         <List
@@ -72,14 +72,10 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
             itemComponent={ListItem}
             onItemClick={selectItem}
         >
-            {/* eslint-disable-next-line react/jsx-no-undef */}
             <MenuItem
                 text="Show Details"
                 action={showItem}
             />
-
         </List>
-
-        There will be User
     </div>
 })

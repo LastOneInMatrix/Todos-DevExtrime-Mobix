@@ -4,7 +4,22 @@ import userStore from '../Store/Users'
 import {TodoResponseType, todosAPI} from "../API/appAPI";
 
 export type TodoType = TodoResponseType;
-class Todo {
+export type ActiveTodoType = { id: number, title?: string };
+
+interface ITodo {
+    todos: TodoResponseType[];
+    activeTodoId: ActiveTodoType;
+    actionType: string;
+    fetchTodo: () => void;
+    addTodo: (title: string) => void;
+    deleteTodo: (id: string | number) => void;
+    completeTodo: (id: string | number, completed: boolean) => void;
+    changeTitleForTask: (title: string) => void;
+    setActiveTodoId: (id: number, title?: string) => void;
+    setActionType: (action: string) => void;
+}
+
+class Todo implements ITodo {
     todos: TodoResponseType[] = [
         {
             userId: parseInt(v1().split('-').join(''), 16),
@@ -13,7 +28,7 @@ class Todo {
             completed: false,
         }
     ]
-    activeTodoId: { id: number, title?: string } = {id: 0, title: ''}
+    activeTodoId: ActiveTodoType = {id: 0, title: ''}
     actionType: string = ''
     constructor() {
         makeAutoObservable(this, {}, {deep: true});
@@ -59,9 +74,7 @@ class Todo {
     }
     async completeTodo(id: string | number, completed: boolean) {
         try {
-            await todosAPI.updateTodos(id, {
-                completed
-            })
+            await todosAPI.updateTodos(id, {completed})
             this.todos = this.todos.map(t => t.id === id ? {...t, completed: !t.completed} : t)
         }
         catch(e: any) {
@@ -78,7 +91,7 @@ class Todo {
         this.activeTodoId.title = title ?? ''
     }
     setActionType(action: string) {
-        this.actionType =action
+        this.actionType = action
     }
 }
 

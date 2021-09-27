@@ -6,8 +6,16 @@ import Button from "devextreme-react/button";
 import {TextBox} from "devextreme-react";
 import {ButtonItem, Form, SimpleItem,} from 'devextreme-react/form';
 
-
-const RenderContent = observer((props: any) =>  {
+type PopupForChangingPropsType = {
+    actionType: string;
+    isPopupVisible: boolean;
+    togglePopup: () => void;
+}
+type RenderContentPropsType = {
+    actionType: string;
+    togglePopup: () => void;
+}
+const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
     const [text, setText] = useState<string>(todoStore.activeTodoId.title ?? '');
     const sendData = (event: FormEvent<HTMLFormElement>) => {
         const type = props.actionType === 'Add' ? 'addTodo' : 'changeTitleForTask';
@@ -45,8 +53,9 @@ const RenderContent = observer((props: any) =>  {
         </form>
 
     )
-})
-export const PopupForChanging = observer((props: any) =>  {
+});
+
+export const PopupForChanging: React.FC<PopupForChangingPropsType> = observer((props) =>  {
     return (
         <div className="App">
             <Popup
@@ -57,9 +66,10 @@ export const PopupForChanging = observer((props: any) =>  {
                 width={500}
                 height={250}
                 resizeEnabled={true}
-                contentRender={() => <RenderContent actionType={props.actionType} togglePopup={props.togglePopup} id={todoStore.activeTodoId}/>}
+                contentRender={() => <RenderContent actionType={props.actionType} togglePopup={props.togglePopup}/>}
             />
         </div>
     );
-})
+});
+
 

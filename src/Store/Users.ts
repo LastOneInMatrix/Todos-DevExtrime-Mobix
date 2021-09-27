@@ -1,9 +1,16 @@
 import {makeAutoObservable} from "mobx";
 import {UserResponseType, usersAPI} from "../API/appAPI";
 
+interface IUsers {
+    users: UserResponseType[];
+    userResponseStatus: string;
+    activeUser: UserResponseType | null;
+    setActiveUser: (activeUser: UserResponseType) => void;
+    getUsers: () => void;
+    setStatus: (err: string) => void;
+}
 
-
-class User {
+class Users implements IUsers {
     users: UserResponseType[] = [];
     userResponseStatus: string = '';
     activeUser: UserResponseType | null = null
@@ -29,4 +36,4 @@ class User {
         this.userResponseStatus = err
     }
 }
-export default new User()
+export default new Users()

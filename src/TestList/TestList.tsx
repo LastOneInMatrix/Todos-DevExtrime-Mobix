@@ -10,31 +10,40 @@ import notify from "devextreme/ui/notify";
 import {useHistory} from "react-router";
 import userStore from "../Store/Users"
 import {observer} from "mobx-react-lite";
+import {TodoResponseType} from "../API/appAPI";
 
 
-export type ConnectedPropsType = any
+type ListItemTmplPropsType = {
+    data: {
+        data: TodoResponseType;
+        index: number;
+    };
+    togglePopup: () => void;
+};
+type ListPropsType = { todos: TodoType[]};
 
-const ListItemTmpl: React.FC<ConnectedPropsType> = observer((props) => {
-    const style = {
-        display: 'flex',
-        justifyContent: 'space-between',
-    }
+const style = {
+    display: 'flex',
+    justifyContent: 'space-between',
+};
+
+const ListItemTmpl: React.FC<ListItemTmplPropsType> = observer((props) => {
     return (
         <div style={style}>
             <div>
                 <CheckBox value={props.data.data.completed} onValueChange={() => {
-                    todoStore.setActiveTodoId(props.data.data.id)
-                    todoStore.completeTodo(todoStore.activeTodoId.id, !props.data.data.completed).catch(e => console.log(e))
+                    todoStore.setActiveTodoId(props.data.data.id);
+                    todoStore
+                        .completeTodo(todoStore.activeTodoId.id, !props.data.data.completed)
+                        .catch(e => console.log(e));
                 }}/>
                 {props.data.data.title}
             </div>
-
-            {/* eslint-disable-next-line react/jsx-no-undef */}
             <div>
                 <Button width={45} style={{margin: '10px'}} icon='rename' onClick={() => {
                     todoStore.setActionType('Change')
-                    props.togglePopup(props.data.data.id)
-                    todoStore.setActiveTodoId(props.data.data.id, props.data.data.title)
+                    props.togglePopup()
+                    todoStore.setActiveTodoId(props.data.data.id, props.data.data.title);
                 }}/>
                 <Button
                     width={45}
@@ -45,18 +54,16 @@ const ListItemTmpl: React.FC<ConnectedPropsType> = observer((props) => {
             </div>
         </div>
     );
-
 })
 
-type ListPropsType = { todos: TodoType[]};
+
 
 function renderLabel() {
     return <div className="toolbar-label"><b>Todo&apos;s for</b> {userStore.activeUser?.name}</div>;
 }
 
-export const TestListComponent = (props: ListPropsType) => {
-
-    const history = useHistory()
+export const TestListComponent: React.FC<ListPropsType> = (props ) => {
+    const history = useHistory();
     const backButtonOptions = {
         type: 'back',
         onClick: () => {
@@ -65,30 +72,20 @@ export const TestListComponent = (props: ListPropsType) => {
             notify('Здесь будет возврат на юзеров');
         }
     };
-
-    const [isPopupVisible, setPopupVisibility] = useState(false);
-
+    const [isPopupVisible, setPopupVisibility] = useState<boolean>(false);
     const togglePopup = () => {
         setPopupVisibility(!isPopupVisible);
     };
     const addButtonOptions = {
         icon: 'plus',
         onClick: () => {
-            todoStore.setActionType('Add')
-            setPopupVisibility(!isPopupVisible)
-            // todoStore.addTodo('s')
-            //     .then(e => notify('Таска добавилась', 'result', 1000))
-            //     .catch(e => {
-            //         debugger
-            //         notify(`Ошибка добавления ${e}`, 'error', 2000)
-            //     })
+            todoStore.setActionType('Add');
+            setPopupVisibility(!isPopupVisible);
         }
     };
 
     return (
-        <React.Fragment>
-
-
+        <>
             <Toolbar>
                 <Item location="before"
                       widget="dxButton"
@@ -124,7 +121,7 @@ export const TestListComponent = (props: ListPropsType) => {
                 />
             </List>
             <PopupForChanging actionType={todoStore.actionType} isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
-        </React.Fragment>
+        </>
     );
 
 }

@@ -1,12 +1,13 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {observer} from "mobx-react-lite";
-import userStore from "../Store/Users"
 import 'devextreme/dist/css/dx.light.css';
 import List, {MenuItem} from 'devextreme-react/list';
 import notify from 'devextreme/ui/notify';
 import {ItemClickEvent} from "devextreme/ui/list";
 import {Redirect} from "react-router";
 import styles from './users.module.css';
+import {useStores} from "../Context/StoreContext";
+
 type ListItemPropsType = {
     data: { id: number, name: string }
 }
@@ -19,7 +20,7 @@ const style = {
 
 const ListItem = (props: ListItemPropsType) => {
     return (
-        <pre style={style}>
+            <pre style={style}>
                     <b>{props.data.name}</b>
                     <b>Users id: {props.data.id}</b>
             </pre>
@@ -27,11 +28,13 @@ const ListItem = (props: ListItemPropsType) => {
 };
 
 export const Users: React.FC<UsersPropsType> = observer((props) => {
+    const {userStore} = useStores();
     const [activeId, setActiveId] = useState<string>('');
     const selectItem = ({itemData, ...rest}: ItemClickEvent) => {
         userStore.setActiveUser(itemData)
         setActiveId(itemData.id)
     };
+
     const showItem = ({itemData}: any) => {
         notify({
             message: `Name: ${itemData.name} ID: ${itemData.id}`,
@@ -69,7 +72,6 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
         <h3 className={styles.title}> Выберите юзера </h3>
         <div className={styles.container}>
             <List
-                // height={'90vh'}
                 dataSource={userMemo}
                 itemComponent={ListItem}
                 onItemClick={selectItem}

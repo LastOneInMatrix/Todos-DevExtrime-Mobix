@@ -1,22 +1,22 @@
 import {makeAutoObservable} from "mobx";
 import {v1} from "uuid";
-import userStore from '../Store/Users'
+import userStore from '../Store/Users';
 import {TodoResponseType, todosAPI} from "../API/appAPI";
-
 export type TodoType = TodoResponseType;
 export type ActiveTodoType = { id: number, title?: string };
 
-interface ITodo {
+export interface ITodo {
     todos: TodoResponseType[];
     activeTodoId: ActiveTodoType;
     actionType: string;
-    fetchTodo: () => void;
+    fetchTodo: () => Promise<any>;
     addTodo: (title: string) => void;
     deleteTodo: (id: string | number) => void;
-    completeTodo: (id: string | number, completed: boolean) => void;
+    completeTodo: (id: string | number, completed: boolean) => Promise<any>;
     changeTitleForTask: (title: string) => void;
     setActiveTodoId: (id: number, title?: string) => void;
     setActionType: (action: string) => void;
+    activeUserTodo: TodoResponseType[];
 }
 
 class Todo implements ITodo {
@@ -92,6 +92,9 @@ class Todo implements ITodo {
     }
     setActionType(action: string) {
         this.actionType = action
+    }
+    get activeUserTodo() {
+        return this.todos.filter((t) => t.userId === userStore.activeUser?.id)
     }
 }
 

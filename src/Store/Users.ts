@@ -1,12 +1,12 @@
 import {makeAutoObservable} from "mobx";
 import {UserResponseType, usersAPI} from "../API/appAPI";
 
-interface IUsers {
+export interface IUsers {
     users: UserResponseType[];
     userResponseStatus: string;
     activeUser: UserResponseType | null;
     setActiveUser: (activeUser: UserResponseType) => void;
-    getUsers: () => void;
+    getUsers: () => Promise<any>;
     setStatus: (err: string) => void;
 }
 

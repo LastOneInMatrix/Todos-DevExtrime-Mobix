@@ -2,16 +2,17 @@ import Button from 'devextreme-react/button';
 import React, {useState} from 'react';
 import List, {ItemDragging} from 'devextreme-react/list';
 import {toJS} from 'mobx';
-import todoStore, {TodoType} from "../Store/Todo";
+import {TodoType} from "../Store/Todo";
 import {CheckBox} from 'devextreme-react/check-box';
 import {PopupForChanging} from "../Popup/Popup";
 import Toolbar, {Item} from 'devextreme-react/toolbar';
 import notify from "devextreme/ui/notify";
 import {useHistory} from "react-router";
-import userStore from "../Store/Users"
 import {observer} from "mobx-react-lite";
-import {TodoResponseType} from "../API/appAPI";
+import {TodoResponseType, UserResponseType} from "../API/appAPI";
 import styles from './testList.module.css';
+import {useStores} from "../Context/StoreContext";
+
 
 type ListItemTmplPropsType = {
     data: {
@@ -20,11 +21,15 @@ type ListItemTmplPropsType = {
     };
     togglePopup: () => void;
 };
-type ListPropsType = { todos: TodoType[]};
+type ListPropsType = {
+    todos: TodoType[];
+    users: UserResponseType[]
+};
 
 
 
 const ListItemTmpl: React.FC<ListItemTmplPropsType> = observer((props) => {
+    const {todoStore} = useStores();
     return (
         <div className={styles.container}>
             <div className={styles.taskText}>
@@ -56,12 +61,13 @@ const ListItemTmpl: React.FC<ListItemTmplPropsType> = observer((props) => {
 
 
 
-function renderLabel() {
-    return <div className="toolbar-label"><b>Todo&apos;s for</b> {userStore.activeUser?.name}</div>;
+function RenderLabel({user} : {user: UserResponseType | null}) {
+    return <div className="toolbar-label"><b>Todo&apos;s for</b> {user?.name ?? 'unknown'}</div>;
 }
 
 export const TestListComponent: React.FC<ListPropsType> = (props ) => {
     const history = useHistory();
+    const {todoStore, userStore} = useStores();
     const backButtonOptions = {
         type: 'back',
         onClick: () => {
@@ -95,9 +101,13 @@ export const TestListComponent: React.FC<ListPropsType> = (props ) => {
                       locateInMenu="auto"
                       widget="dxButton"
                       options={addButtonOptions}/>
+                {/*<Item location="center"*/}
+                {/*      locateInMenu="never"*/}
+                {/*      render={RenderLabel}/>*/}
                 <Item location="center"
                       locateInMenu="never"
-                      render={renderLabel}/>
+                      render={() => <RenderLabel user={userStore.activeUser}/>}/>
+
             </Toolbar>
             <List
                 height={'100vh'}

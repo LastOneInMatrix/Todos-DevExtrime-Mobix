@@ -12,6 +12,7 @@ import {observer} from "mobx-react-lite";
 import {TodoResponseType, UserResponseType} from "../API/appAPI";
 import styles from './testList.module.css';
 import {useStores} from "../Context/StoreContext";
+import {rootStore} from "../Store/RootStore";
 
 
 type ListItemTmplPropsType = {
@@ -29,30 +30,30 @@ type ListPropsType = {
 
 
 const ListItemTmpl: React.FC<ListItemTmplPropsType> = observer((props) => {
-    const {todoStore} = useStores();
+    const {rootStore} = useStores();
     return (
         <div className={styles.container}>
             <div className={styles.taskText}>
                 <CheckBox value={props.data.data.completed} onValueChange={() => {
-                    todoStore.setActiveTodoId(props.data.data.id);
-                    todoStore
-                        .completeTodo(todoStore.activeTodoId.id, !props.data.data.completed)
-                        .catch(e => console.log(e));
+                    rootStore.todoStore.setActiveTodoId(props.data.data.id);
+                    rootStore.todoStore
+                        .completeTodo(rootStore.todoStore.activeTodoId.id, !props.data.data.completed)
+                        .catch((e: any) => console.log(e));
                 }}/>
                    <p>{props.data.data.title}</p>
 
             </div>
             <div>
                 <Button width={45} style={{margin: '10px'}} icon='rename' onClick={() => {
-                    todoStore.setActionType('Change')
+                    rootStore.todoStore.setActionType('Change')
                     props.togglePopup()
-                    todoStore.setActiveTodoId(props.data.data.id, props.data.data.title);
+                    rootStore.todoStore.setActiveTodoId(props.data.data.id, props.data.data.title);
                 }}/>
                 <Button
                     width={45}
                     icon="trash"
                     type="danger"
-                    onClick={() => todoStore.deleteTodo(toJS(props.data.data.id))}
+                    onClick={() => rootStore.todoStore.deleteTodo(toJS(props.data.data.id))}
                 />
             </div>
         </div>
@@ -67,12 +68,12 @@ function RenderLabel({user} : {user: UserResponseType | null}) {
 
 export const TestListComponent: React.FC<ListPropsType> = (props ) => {
     const history = useHistory();
-    const {todoStore, userStore} = useStores();
+    const {rootStore} = useStores();
     const backButtonOptions = {
         type: 'back',
         onClick: () => {
             history.push('/')
-            todoStore.todos = [] //TODO узнать насчет прямого изменения без экшена
+            rootStore.todoStore.todos = [] //TODO узнать насчет прямого изменения без экшена
             notify('Здесь будет возврат на юзеров');
         }
     };
@@ -83,7 +84,7 @@ export const TestListComponent: React.FC<ListPropsType> = (props ) => {
     const addButtonOptions = {
         icon: 'plus',
         onClick: () => {
-            todoStore.setActionType('Add');
+            rootStore.todoStore.setActionType('Add');
             setPopupVisibility(!isPopupVisible);
         }
     };
@@ -106,7 +107,7 @@ export const TestListComponent: React.FC<ListPropsType> = (props ) => {
                 {/*      render={RenderLabel}/>*/}
                 <Item location="center"
                       locateInMenu="never"
-                      render={() => <RenderLabel user={userStore.activeUser}/>}/>
+                      render={() => <RenderLabel user={rootStore.userStore.activeUser}/>}/>
 
             </Toolbar>
             <List
@@ -128,7 +129,7 @@ export const TestListComponent: React.FC<ListPropsType> = (props ) => {
                     allowReordering={true}
                 />
             </List>
-            <PopupForChanging actionType={todoStore.actionType} isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
+            <PopupForChanging actionType={rootStore.todoStore.actionType} isPopupVisible={isPopupVisible} togglePopup={togglePopup}/>
         </>
     );
 

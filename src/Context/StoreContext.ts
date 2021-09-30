@@ -1,9 +1,8 @@
 import React from 'react';
-import userStore, {IUsers} from "../Store/Users";
-import todoStore, {ITodo} from '../Store/Todo';
-export const StoreContext = React.createContext<{userStore: IUsers, todoStore: ITodo}>({
-    userStore,
-    todoStore
-});
+import {rootStore, RootStoreType} from "../Store/RootStore";
+
+export const StoreContext = React.createContext<{rootStore: RootStoreType}>({rootStore});
 
 export const useStores = () => React.useContext(StoreContext);
+
+

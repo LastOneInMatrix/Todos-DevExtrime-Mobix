@@ -1,7 +1,7 @@
 import {makeAutoObservable} from "mobx";
 import {v1} from "uuid";
-import userStore from '../Store/Users';
 import {TodoResponseType, todosAPI} from "../API/appAPI";
+import {RootStore} from "./RootStore";
 export type TodoType = TodoResponseType;
 export type ActiveTodoType = { id: number, title?: string };
 
@@ -10,16 +10,17 @@ export interface ITodo {
     activeTodoId: ActiveTodoType;
     actionType: string;
     fetchTodo: () => Promise<any>;
-    addTodo: (title: string) => void;
+    addTodo: (title: string) => Promise<any>;
     deleteTodo: (id: string | number) => void;
     completeTodo: (id: string | number, completed: boolean) => Promise<any>;
-    changeTitleForTask: (title: string) => void;
+    changeTitleForTask: (title: string) => Promise<any>;
     setActiveTodoId: (id: number, title?: string) => void;
     setActionType: (action: string) => void;
     activeUserTodo: TodoResponseType[];
 }
 
-class Todo implements ITodo {
+export class Todo implements ITodo {
+    root: RootStore;
     todos: TodoResponseType[] = [
         {
             userId: parseInt(v1().split('-').join(''), 16),
@@ -30,8 +31,9 @@ class Todo implements ITodo {
     ]
     activeTodoId: ActiveTodoType = {id: 0, title: ''}
     actionType: string = ''
-    constructor() {
+    constructor(root: RootStore) {
         makeAutoObservable(this, {}, {deep: true});
+        this.root = root
     }
     async fetchTodo() {
         try {
@@ -46,8 +48,8 @@ class Todo implements ITodo {
     }
     async addTodo(title: string) {
         try {
-           console.log(userStore.activeUser?.id)
-            const newTask = await todosAPI.addTask(userStore.activeUser?.id ?? parseInt(v1().split('-').join(''), 16), title);
+           console.log(this.root.userStore.activeUser?.id)
+            const newTask = await todosAPI.addTask(this.root.userStore.activeUser?.id ?? parseInt(v1().split('-').join(''), 16), title);
             this.todos.unshift({
                 ...newTask,
                 completed: false
@@ -94,8 +96,7 @@ class Todo implements ITodo {
         this.actionType = action
     }
     get activeUserTodo() {
-        return this.todos.filter((t) => t.userId === userStore.activeUser?.id)
+        return this.todos.filter((t) => t.userId === this.root.userStore.activeUser?.id)
     }
 }
 
-export default new Todo()

@@ -1,11 +1,11 @@
 import React, {FormEvent, useEffect, useState} from 'react';
 import {Popup} from 'devextreme-react/popup';
 import {observer} from "mobx-react-lite";
-import todoStore from "../Store/Todo";
 import Button from "devextreme-react/button";
 import {TextBox} from "devextreme-react";
 import {ButtonItem, Form, SimpleItem,} from 'devextreme-react/form';
 import st from './popup.module.css'
+import {useStores} from "../Context/StoreContext";
 // import DevExpress from "devextreme";
 // import NativeEventInfo = DevExpress.events.NativeEventInfo;
 // import dxTextBox from "devextreme/ui/text_box";
@@ -23,21 +23,22 @@ type RenderContentPropsType = {
 }
 const RenderContent: React.FC<RenderContentPropsType> = observer((props ) =>  {
     const [text, setText] = useState<string>('');
+    const {rootStore} = useStores();
     useEffect(() => {
-        setText(todoStore.activeTodoId.title ?? '');
+        setText(rootStore.todoStore.activeTodoId.title ?? '');
         return () => {
             setText('');
         }
-    }, [todoStore.activeTodoId.title]); //Todo уточнить насчет мутируемых депов
+    }, [rootStore.todoStore.activeTodoId.title]); //Todo уточнить насчет мутируемых депов
 
     const sendData = (event: FormEvent<HTMLFormElement>) => {
         const type = props.actionType === 'Add' ? 'addTodo' : 'changeTitleForTask';
-        todoStore
+        rootStore.todoStore
         [type](text)
-            .catch(e=>console.log(e))
+            .catch((e: any)=>console.log(e))
         props.togglePopup();
         event.preventDefault();
-        todoStore.activeTodoId.title = ''
+        rootStore.todoStore.activeTodoId.title = ''
     }
     const submitButtonOptions = {
         text: "Submit the Form",

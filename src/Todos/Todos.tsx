@@ -7,14 +7,14 @@ import {toJS} from "mobx";
 
 export const Todos = observer(() => {
         const params = useParams<{ userId: string }>();
-        const {todoStore, userStore} = useStores();
+        const {rootStore} = useStores();
         useEffect(() => {
-            todoStore.fetchTodo().catch(e => console.log(e))
+            rootStore.todoStore.fetchTodo().catch((e: any) => console.log(e))
         }, []);
 
-        console.log(todoStore.activeUserTodo.map(t => toJS(t)))
+        console.log(rootStore.todoStore.activeUserTodo.map((t: any) => toJS(t)))
         return <>
-                <TestListComponent todos={todoStore.activeUserTodo} users={userStore.users}/>
+                <TestListComponent todos={rootStore.todoStore.activeUserTodo} users={rootStore.userStore.users}/>
             </>
     }
 )

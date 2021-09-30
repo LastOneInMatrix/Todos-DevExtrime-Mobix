@@ -8,6 +8,7 @@ import {Redirect} from "react-router";
 import styles from './users.module.css';
 import {useStores} from "../Context/StoreContext";
 
+
 type ListItemPropsType = {
     data: { id: number, name: string }
 }
@@ -28,10 +29,11 @@ const ListItem = (props: ListItemPropsType) => {
 };
 
 export const Users: React.FC<UsersPropsType> = observer((props) => {
-    const {userStore} = useStores();
+    const {rootStore} = useStores();
+    console.log(rootStore)
     const [activeId, setActiveId] = useState<string>('');
     const selectItem = ({itemData, ...rest}: ItemClickEvent) => {
-        userStore.setActiveUser(itemData)
+        rootStore.userStore.setActiveUser(itemData)
         setActiveId(itemData.id)
     };
 
@@ -45,23 +47,23 @@ export const Users: React.FC<UsersPropsType> = observer((props) => {
     };
 
     useEffect(() => {
-        userStore.getUsers()
-            .catch(e => {
-                userStore.setStatus(e)
+        rootStore.userStore.getUsers()
+            .catch((e: any) => {
+                rootStore.userStore.setStatus(e)
             })
     }, [])
     const userMemo = useMemo(() => {
-        return userStore.users.map((u) => {
+        return rootStore.userStore.users.map((u: any) => {
             return {id: u.id, name: u.name}
         })
-    }, [userStore.users])
+    }, [rootStore.userStore.users])
 
     if (activeId !== '') {
         return <Redirect to={`/todos/${activeId}`}/>
     }
-    if (userStore.userResponseStatus) {
+    if (rootStore.userStore.userResponseStatus) {
         notify({
-            message: userStore.userResponseStatus,
+            message: rootStore.userStore.userResponseStatus,
             width: 200,
             height: 50,
             shading: true

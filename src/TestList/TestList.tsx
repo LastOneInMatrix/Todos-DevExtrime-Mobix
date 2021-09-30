@@ -12,7 +12,7 @@ import {observer} from "mobx-react-lite";
 import {TodoResponseType, UserResponseType} from "../API/appAPI";
 import styles from './testList.module.css';
 import {useStores} from "../Context/StoreContext";
-import {rootStore} from "../Store/RootStore";
+
 
 
 type ListItemTmplPropsType = {
